@@ -10,13 +10,12 @@ public class GameManager : MonoBehaviour
     public Camera[] cameras;
     public int levelID;
     private static int attemptNumber = 1;
-    //public TextMeshProUGUI Score;
-    //public TextMeshProUGUI Timer;
-    //public TextMeshProUGUI Swaps;
-    //public TextMeshProUGUI AttemptsText;
+    private int TimesSwitched = 0;
     public TextMeshProUGUI TimeUntilNextSwitch;
+    public TextMeshProUGUI BaseScore;
+    public TextMeshProUGUI SwapsScore;
+    public TextMeshProUGUI TotalScore;
     public double baseScore = 100;
-    public int generalTime = 60;
     public int baseTime = 30;
     public static int timeBetweenSwitches = 30;
     private int timeSinceLastSwitch = 0;
@@ -28,7 +27,10 @@ public class GameManager : MonoBehaviour
     public GameObject[] pauseObjects;
     public GameObject[] resumeObjects;
     public GameObject[] goals;
+    public GameObject WinMenu;
     private bool isPaused = false;
+    public AudioSource Music;
+    public AudioClip VictoryJingle;
 
     private void Start()
     {
@@ -87,6 +89,8 @@ public class GameManager : MonoBehaviour
                 cameras[i].gameObject.SetActive(false);
             }
         }
+
+        WinMenu.SetActive(false);
     }
 
     // Update is called once per frame
@@ -131,6 +135,10 @@ public class GameManager : MonoBehaviour
                 cameras[sideID].gameObject.SetActive(true);
             }
             timeSinceLastSwitch = 0;
+            TimesSwitched += 1;
+            //Restart music
+            Music.Stop();
+            Music.Play();
         }
         //Timer.text = "Time: " + timer;
         TimeUntilNextSwitch.text = "Switch: " + (timeBetweenSwitches - timeSinceLastSwitch);
@@ -158,7 +166,22 @@ public class GameManager : MonoBehaviour
 
     void finishLevel()
     {
-        Debug.Log("Finished level, this is where to connect levels at");
+        Music.Stop();
+        //Show win menu
+        WinMenu.SetActive(true);
+        togglePause();
+        Music.PlayOneShot(VictoryJingle);
+        if (pauseObjects.Length > 0)
+        {
+            foreach (GameObject obj in pauseObjects)
+            {
+                obj.SetActive(false);
+            }
+        }
+        //Populate info
+        BaseScore.text = "Base Score: " + baseScore;
+        SwapsScore.text = "Swaps: " + TimesSwitched;
+        TotalScore.text = "Score: " + Mathf.RoundToInt((float) (baseScore * 30/ (TimesSwitched*30+timeSinceLastSwitch)));
     }
 
     public int getSideID()
@@ -172,17 +195,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public void calculateScore()
-    {
-        //Calculate score
-        //int SwapsUsed = Int32.Parse(Swaps.text.Substring(7).Trim());
-        //Calculate Score
-        //double totalScore = baseScore * generalTime / (totalTime);
-        //Score.text = "Score: " + Math.Round(totalScore);
-        //Reset Attempts
-        attemptNumber = 1;
-    }
-
     public void switchScenes(string scene)
     {
         if (SceneManager.GetSceneByName(scene) == null) { Debug.LogError("Scene " + scene + "did not exist!"); return; }
@@ -194,10 +206,12 @@ public class GameManager : MonoBehaviour
         if (!isPaused)
         {
             Time.timeScale = 0f;
+            Music.Pause();
         }
         else
         {
             Time.timeScale = 1f;
+            Music.UnPause();
         }
         isPaused = !isPaused;
         //Update all pause/unpause objects

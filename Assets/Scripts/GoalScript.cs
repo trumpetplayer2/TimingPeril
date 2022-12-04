@@ -8,6 +8,8 @@ public class GoalScript : MonoBehaviour
     bool onGoal;
     public Color defaultColor;
     public Color finishColor;
+    public AudioClip activate;
+    public ParticleSystem particles;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -19,6 +21,15 @@ public class GoalScript : MonoBehaviour
         if(this.gameObject.transform.parent.gameObject.GetComponent<SpriteRenderer>() == null) { Debug.Log("Sprite renderer not found for " + this.gameObject.transform.parent.gameObject.name); return; }
         this.gameObject.transform.parent.gameObject.GetComponent<SpriteRenderer>().color = finishColor;
         onGoal = true;
+        if (this.gameObject.GetComponent<AudioSource>() != null)
+        {
+            if (!this.gameObject.GetComponent<AudioSource>().isPlaying)
+            {
+                this.gameObject.GetComponent<AudioSource>().pitch = 3;
+                this.gameObject.GetComponent<AudioSource>().PlayOneShot(activate);
+            }
+        }
+        particles.Play();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -30,6 +41,15 @@ public class GoalScript : MonoBehaviour
         if (this.gameObject.transform.parent.gameObject.GetComponent<SpriteRenderer>() == null) { Debug.Log("Sprite renderer not found for " + this.gameObject.gameObject.name); return; }
         this.gameObject.transform.parent.gameObject.GetComponent<SpriteRenderer>().color = defaultColor;
         onGoal = false;
+        if (this.gameObject.GetComponent<AudioSource>() != null)
+        {
+            if (!this.gameObject.GetComponent<AudioSource>().isPlaying)
+            {
+                this.gameObject.GetComponent<AudioSource>().pitch = 1;
+                this.gameObject.GetComponent<AudioSource>().PlayOneShot(activate);
+            }
+        }
+        particles.Stop();
     }
 
     public bool getOnGoal()

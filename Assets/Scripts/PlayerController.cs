@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     public bool isOnGround;
     private float inX = 0f;
     GameManager gameManager;
+    public AudioClip jumpSound;
+    public float boxPushDistance;
+    public LayerMask boxMask;
 
 
     private void Start()
@@ -35,13 +38,27 @@ public class PlayerController : MonoBehaviour
     {
         if(Time.timeScale <= 0) { return; }
         if (gameManager.getSideID() != playerSide) { return; }
+        //Jump
         isOnGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         if (Input.GetButton("Jump") && isOnGround)
         {
             Player.velocity = new Vector2(Player.velocity.x, jumpPower);
+            //Get Player audio source and play sound
+            if(this.gameObject.GetComponent<AudioSource>() != null)
+            {
+                if (!this.gameObject.GetComponent<AudioSource>().isPlaying) { 
+                this.gameObject.GetComponent<AudioSource>().PlayOneShot(jumpSound);
+                }
+            }
         }
 
         Vector2 moveX = new Vector2(inX * movementSpeed, Player.velocity.y);
         Player.velocity = moveX;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, (Vector2) transform.position + Vector2.right * transform.localScale.x * boxPushDistance);
     }
 }
