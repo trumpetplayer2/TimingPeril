@@ -5,6 +5,7 @@ using UnityEngine;
 public class Triggered : MonoBehaviour
 {
     public bool isTriggered = false;
+    int itemsInside = 0;
     public bool getTriggered()
     {
         return isTriggered;
@@ -14,6 +15,7 @@ public class Triggered : MonoBehaviour
     {
         if (collision.tag.Equals("Box")) { return; }
         isTriggered = true;
+        itemsInside += 1;
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -23,6 +25,10 @@ public class Triggered : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.tag.Equals("Box")) { return; }
-        isTriggered = false;
+        itemsInside -= 1;
+        if (itemsInside <= 0)
+        {
+            isTriggered = false;
+        }
     }
 }

@@ -113,7 +113,7 @@ public class GameManager : MonoBehaviour
             totalTime += 1;
             timeSinceLastSwitch += 1;
         }
-        if (Input.GetButtonDown("Fire1") && timeSinceLastSwitch > 5)
+        if (Input.GetButtonDown("Fire1") && timeSinceLastSwitch > 1)
         {
             timeSinceLastSwitch += timeBetweenSwitches - timeSinceLastSwitch;
         }
