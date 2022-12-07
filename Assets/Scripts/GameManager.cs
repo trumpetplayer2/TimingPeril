@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     public GameObject[] pauseObjects;
     public GameObject[] resumeObjects;
     public GameObject[] goals;
+    public Rigidbody2D[] playerHitboxes;
     public GameObject WinMenu;
     private bool isPaused = false;
     public AudioSource Music;
@@ -87,6 +88,7 @@ public class GameManager : MonoBehaviour
             if (i != 0)
             {
                 cameras[i].gameObject.SetActive(false);
+                playerHitboxes[i].constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
             }
         }
 
@@ -126,13 +128,19 @@ public class GameManager : MonoBehaviour
             {
                 sideID = 0;
                 cameras[cameras.Length - 1].gameObject.SetActive(false);
+                playerHitboxes[cameras.Length - 1].constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
                 cameras[0].gameObject.SetActive(true);
+                playerHitboxes[0].constraints = RigidbodyConstraints2D.FreezeRotation;
+                playerHitboxes[0].AddForce(new Vector2(0, 0.1f));
             }
             else
             {
                 cameras[sideID].gameObject.SetActive(false);
+                playerHitboxes[sideID].constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
                 sideID++;
                 cameras[sideID].gameObject.SetActive(true);
+                playerHitboxes[sideID].constraints = RigidbodyConstraints2D.FreezeRotation;
+                playerHitboxes[sideID].AddForce(new Vector2(0, 0.1f));
             }
             timeSinceLastSwitch = 0;
             TimesSwitched += 1;
